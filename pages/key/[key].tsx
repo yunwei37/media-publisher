@@ -5,16 +5,37 @@ import { MediaKeyForm } from '../../components/MediaKeyForm'
 import { MediaKeyTable } from '../../components/MediaKeyTable'
 import { fetchKeyDetails, fetchMediaKeys, saveMediaKey, deleteMediaKey } from '../../lib/media-keys'
 import { KeyDetails, MediaKeys } from '../../lib/media-keys'
+import { KeyDetailsPanel } from '../../components/KeyDetailsPanel'
+import { MediaKeyPanel } from '../../components/MediaKeyPanel'
+
+function Toggle({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      className={`${
+        checked ? 'bg-indigo-600' : 'bg-gray-200'
+      } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none`}
+      onClick={() => onChange(!checked)}
+    >
+      <span
+        className={`${
+          checked ? 'translate-x-6' : 'translate-x-1'
+        } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+      />
+    </button>
+  );
+}
 
 function KeyPage() {
   const router = useRouter()
   const { key, loginPasswd } = router.query
   const [mediaKeys, setMediaKeys] = useState<MediaKeys>({})
-  const [newKey, setNewKey] = useState('')
-  const [newValue, setNewValue] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const [keyDetails, setKeyDetails] = useState<KeyDetails | null>(null)
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [tags, setTags] = useState(['', '', ''])
+  const [isDraft, setIsDraft] = useState(true)
+  const [isPublishing, setIsPublishing] = useState(false)
 
   useEffect(() => {
     if (key && loginPasswd) {
@@ -27,38 +48,54 @@ function KeyPage() {
           setKeyDetails(details)
           setMediaKeys(keys)
         } catch (err) {
-          setError('Failed to load data')
+          console.error('Failed to load data')
         }
       }
       loadData()
     }
   }, [key, loginPasswd])
 
-  const handleSaveMediaKey = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    try {
-      await saveMediaKey(key as string, newKey, newValue)
-      const keys = await fetchMediaKeys(key as string, loginPasswd as string)
-      setMediaKeys(keys)
-      setNewKey('')
-      setNewValue('')
-    } catch (err) {
-      setError('Failed to save media key')
-    } finally {
-      setLoading(false)
-    }
+  const handleTagChange = (index: number, value: string) => {
+    const newTags = [...tags]
+    newTags[index] = value
+    setTags(newTags)
   }
 
-  const handleDeleteMediaKey = async (mediaKey: string) => {
+  const handlePublish = async () => {
+    if (!title || !content || !tags.filter(Boolean).length) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    setIsPublishing(true)
     try {
-      await deleteMediaKey(key as string, mediaKey)
-      const keys = await fetchMediaKeys(key as string, loginPasswd as string)
-      setMediaKeys(keys)
-    } catch (err) {
-      setError('Failed to delete media key')
+      const response = await fetch(`/api/publish/devto`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key as string,
+        },
+        body: JSON.stringify({
+          title,
+          content,
+          tags: tags.filter(Boolean),
+          is_draft: isDraft,
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error.message)
+      }
+
+      alert('Successfully published to DEV.to!')
+      setTitle('')
+      setContent('')
+      setTags(['', '', ''])
+    } catch (error) {
+      alert(`Failed to publish: ${error.message}`)
+    } finally {
+      setIsPublishing(false)
     }
   }
 
@@ -70,47 +107,86 @@ function KeyPage() {
         </Text>
       </div>
 
-      <div className="mb-4">
-        {keyDetails && (
-          <div className="mt-2 p-4 border rounded-lg">
-            <Text className="mb-2">Name: {keyDetails.name}</Text>
-            <Text className="mb-2">Key ID: {keyDetails.jti}</Text>
-            <Text className="mb-2">Rate Limit: {keyDetails.limit} requests</Text>
-            <Text className="mb-2">Time Frame: {keyDetails.timeframe} seconds</Text>
-            <Text>Created: {new Date(keyDetails.iat * 1000).toLocaleString()}</Text>
+      <KeyDetailsPanel keyDetails={keyDetails} />
+
+      <MediaKeyPanel
+        mediaKeys={mediaKeys}
+        setMediaKeys={setMediaKeys}
+        apiKey={key as string}
+        loginPasswd={loginPasswd as string}
+      />
+
+      <div className="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-lg shadow">
+        <Text variant="h2" className="mb-6">
+          Publish to DEV.to
+        </Text>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Title
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              placeholder="Article title"
+            />
           </div>
-        )}
-      </div>
 
-      <div className="mb-6">
-        <Text variant="h2" className="mb-4">Media Keys</Text>
-        
-        <MediaKeyForm
-          onSubmit={handleSaveMediaKey}
-          newKey={newKey}
-          setNewKey={setNewKey}
-          newValue={newValue}
-          setNewValue={setNewValue}
-          loading={loading}
-        />
-
-        {error && (
-          <div className="text-red-500 mb-4">
-            {error}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Content (Markdown)
+            </label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={10}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              placeholder="Write your article in markdown..."
+            />
           </div>
-        )}
 
-        <div className="border rounded-lg overflow-hidden">
-          <MediaKeyTable
-            mediaKeys={mediaKeys}
-            onDelete={handleDeleteMediaKey}
-          />
+          <div className="grid grid-cols-3 gap-4">
+            {tags.map((tag, index) => (
+              <div key={index}>
+                <label className="block text-sm font-medium text-gray-700">
+                  Tag {index + 1}
+                </label>
+                <input
+                  type="text"
+                  value={tag}
+                  onChange={(e) => handleTagChange(index, e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  placeholder="Enter tag"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <Toggle checked={isDraft} onChange={setIsDraft} />
+            <span className="text-sm text-gray-600">Save as draft</span>
+          </div>
+
+          <div>
+            <Button
+              variant="primary"
+              onClick={handlePublish}
+              disabled={isPublishing}
+            >
+              {isPublishing ? 'Publishing...' : 'Publish to DEV.to'}
+            </Button>
+          </div>
         </div>
       </div>
 
-      <Link href="/">
-        <Button variant="secondary">Back to Home</Button>
-      </Link>
+      <div className="mt-8">
+        <Link href="/">
+          <Button variant="secondary">Back to Home</Button>
+        </Link>
+      </div>
     </Page>
   )
 }
