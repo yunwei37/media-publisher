@@ -33,14 +33,7 @@ function RateLimit() {
     <Page>
       <div className="text-center mb-6">
         <Text variant="h1" className="mb-4">
-          API Rate Limiting with Upstash
-        </Text>
-        <Text className="mb-4">
-          With <i className="font-semibold">Vercel&apos;s Edge Middleware</i>{' '}
-          we&apos;re able to do API rate limiting by keeping a counter of
-          requests by IP or API token. For the demo below you can send a maximum
-          of <b>5</b> requests every <b>10</b> seconds, which increases if using
-          an API token.
+          Media Publish tool
         </Text>
       </div>
 
@@ -64,7 +57,8 @@ function RateLimit() {
           <div>No API Keys found</div>
         ) : (
           <ul className="border-accents-2 border rounded-md bg-white divide-y divide-accents-2 my-6">
-            {apiKeys.map(([key, { limit, timeframe }]) => (
+            {apiKeys.map(([key, { limit, timeframe }]: [string, { limit: number, timeframe: string }]) => (
+
               <li key={key} className="flex items-center justify-content p-6">
                 <span className="flex-1 mr-4 sm:mr-8">
                   <h3 className="text-sm font-semibold text-black break-all">

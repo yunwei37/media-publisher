@@ -9,7 +9,12 @@ function fetchDemo(key: string) {
   }
 })`
 }
-const ApiRequest: FC<{ token: string }> = ({ token }) => {
+interface ApiRequestProps {
+  token: string;
+  loginPasswd: string;
+}
+
+const ApiRequest: FC<ApiRequestProps> = ({ token, loginPasswd }) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [state, setState] = useState<any>({
     latency: null,
