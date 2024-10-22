@@ -3,38 +3,36 @@ import { Layout, Page, Text, Link, Button } from '@vercel/examples-ui'
 import { useState, useEffect } from 'react'
 import { MediaKeyForm } from '../../components/MediaKeyForm'
 import { MediaKeyTable } from '../../components/MediaKeyTable'
+import { fetchKeyDetails, fetchMediaKeys, saveMediaKey, deleteMediaKey } from '../../lib/media-keys'
+import { KeyDetails, MediaKeys } from '../../lib/media-keys'
 
 function KeyPage() {
   const router = useRouter()
-  const { key } = router.query
-  const [mediaKeys, setMediaKeys] = useState<Record<string, string>>({})
+  const { key, loginPasswd } = router.query
+  const [mediaKeys, setMediaKeys] = useState<MediaKeys>({})
   const [newKey, setNewKey] = useState('')
   const [newValue, setNewValue] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [keyDetails, setKeyDetails] = useState<KeyDetails | null>(null)
 
-  // Fetch media keys on load
   useEffect(() => {
-    if (key) {
-      fetchMediaKeys()
-    }
-  }, [key])
-
-  const fetchMediaKeys = async () => {
-    try {
-      const res = await fetch('/api/mediakeys', {
-        headers: {
-          'x-api-key': key as string,
-        },
-      })
-      const data = await res.json()
-      if (data.mediaKeys) {
-        setMediaKeys(data.mediaKeys)
+    if (key && loginPasswd) {
+      const loadData = async () => {
+        try {
+          const [details, keys] = await Promise.all([
+            fetchKeyDetails(key as string, loginPasswd as string),
+            fetchMediaKeys(key as string, loginPasswd as string)
+          ])
+          setKeyDetails(details)
+          setMediaKeys(keys)
+        } catch (err) {
+          setError('Failed to load data')
+        }
       }
-    } catch (err) {
-      setError('Failed to fetch media keys')
+      loadData()
     }
-  }
+  }, [key, loginPasswd])
 
   const handleSaveMediaKey = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,22 +40,9 @@ function KeyPage() {
     setError('')
 
     try {
-      const res = await fetch('/api/mediakeys', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key as string,
-        },
-        body: JSON.stringify({ key: newKey, value: newValue }),
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to save media key')
-      }
-
-      // Refresh media keys
-      await fetchMediaKeys()
-      // Clear form
+      await saveMediaKey(key as string, newKey, newValue)
+      const keys = await fetchMediaKeys(key as string, loginPasswd as string)
+      setMediaKeys(keys)
       setNewKey('')
       setNewValue('')
     } catch (err) {
@@ -69,19 +54,9 @@ function KeyPage() {
 
   const handleDeleteMediaKey = async (mediaKey: string) => {
     try {
-      const res = await fetch(`/api/mediakeys?key=${mediaKey}`, {
-        method: 'DELETE',
-        headers: {
-          'x-api-key': key as string,
-        },
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to delete media key')
-      }
-
-      // Refresh media keys
-      await fetchMediaKeys()
+      await deleteMediaKey(key as string, mediaKey)
+      const keys = await fetchMediaKeys(key as string, loginPasswd as string)
+      setMediaKeys(keys)
     } catch (err) {
       setError('Failed to delete media key')
     }
@@ -96,7 +71,15 @@ function KeyPage() {
       </div>
 
       <div className="mb-4">
-        <Text>Selected API Key: {key}</Text>
+        {keyDetails && (
+          <div className="mt-2 p-4 border rounded-lg">
+            <Text className="mb-2">Name: {keyDetails.name}</Text>
+            <Text className="mb-2">Key ID: {keyDetails.jti}</Text>
+            <Text className="mb-2">Rate Limit: {keyDetails.limit} requests</Text>
+            <Text className="mb-2">Time Frame: {keyDetails.timeframe} seconds</Text>
+            <Text>Created: {new Date(keyDetails.iat * 1000).toLocaleString()}</Text>
+          </div>
+        )}
       </div>
 
       <div className="mb-6">

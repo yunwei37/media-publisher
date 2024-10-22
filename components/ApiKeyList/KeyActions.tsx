@@ -32,7 +32,12 @@ const KeyActions: React.FC<KeyActionsProps> = ({
   mutate
 }) => (
   <span className="flex justify-end flex-col sm:flex-row">
-    <Link href={`/key/${encodeURIComponent(apiKey)}`}>
+    <Link
+        href={{
+            pathname: `/key/${encodeURIComponent(apiKey)}`,
+            query: { loginPasswd: loginPasswd },
+        }}
+        >
       <Button
         className="mb-2 sm:mr-2 sm:mb-0"
         size="sm"
