@@ -4,11 +4,29 @@ import { nanoid } from 'nanoid'
 import { API_KEYS, API_KEYS_JWT_SECRET_KEY } from '@lib/api/constants'
 import type { ApiTokenPayload } from '@lib/api/keys'
 import { upstashRest } from '@lib/upstash'
+import { log } from 'console'
 
 const decode = (jwt: string) =>
   JSON.parse(new TextDecoder().decode(base64url.decode(jwt.split('.')[1])))
 
+const LOGIN_PASSWD = process.env.LOGIN_PASSWD
+
+const validatePassword = (req: NextApiRequest): boolean => {
+  const providedPassword = req.headers['x-login-passwd']
+  // print providedPassword
+  // console.debug(providedPassword)
+  return providedPassword === LOGIN_PASSWD
+}
+
 export default async function keys(req: NextApiRequest, res: NextApiResponse) {
+  console.log('Request method:', req.method)
+  console.log('X-Login-Passwd header:', req.headers['x-login-passwd'])
+  
+  if (!validatePassword(req)) {
+    console.log('Password validation failed')
+    return res.status(401).json({ error: { message: 'Unauthorized' } })
+  }
+
   try {
     switch (req.method) {
       case 'PUT': {
@@ -16,7 +34,7 @@ export default async function keys(req: NextApiRequest, res: NextApiResponse) {
         const payload: ApiTokenPayload = {
           jti: nanoid(),
           iat: Date.now() / 1000,
-          limit: 500,
+          limit: 100,
           timeframe: 60,
         }
         const token = await new SignJWT(payload)
@@ -58,9 +76,9 @@ export default async function keys(req: NextApiRequest, res: NextApiResponse) {
         })
     }
   } catch (err) {
-    console.error(err)
+    console.error('Error in API route:', err)
     return res.status(500).json({
-      error: { message: `An error ocurred, ${err}` },
+      error: { message: 'An internal server error occurred' },
     })
   }
 }
