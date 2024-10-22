@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router'
 import { Layout, Page, Text, Link, Button } from '@vercel/examples-ui'
 import { useState, useEffect } from 'react'
+import { MediaKeyForm } from '../../components/MediaKeyForm'
+import { MediaKeyTable } from '../../components/MediaKeyTable'
 
 function KeyPage() {
   const router = useRouter()
@@ -97,75 +99,29 @@ function KeyPage() {
         <Text>Selected API Key: {key}</Text>
       </div>
 
-      {/* Media Keys Section */}
       <div className="mb-6">
         <Text variant="h2" className="mb-4">Media Keys</Text>
         
-        {/* Add New Media Key Form */}
-        <form onSubmit={handleSaveMediaKey} className="mb-4">
-          <div className="flex gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Key name"
-              value={newKey}
-              onChange={(e) => setNewKey(e.target.value)}
-              className="flex-1 p-2 border rounded"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Key value"
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-              className="flex-1 p-2 border rounded"
-              required
-            />
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Add Media Key'}
-            </Button>
-          </div>
-        </form>
+        <MediaKeyForm
+          onSubmit={handleSaveMediaKey}
+          newKey={newKey}
+          setNewKey={setNewKey}
+          newValue={newValue}
+          setNewValue={setNewValue}
+          loading={loading}
+        />
 
-        {/* Error Message */}
         {error && (
           <div className="text-red-500 mb-4">
             {error}
           </div>
         )}
 
-        {/* Media Keys List */}
         <div className="border rounded-lg overflow-hidden">
-          {Object.entries(mediaKeys).length === 0 ? (
-            <div className="p-4 text-gray-500">
-              No media keys found
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left">Key</th>
-                  <th className="px-4 py-2 text-left">Value</th>
-                  <th className="px-4 py-2 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(mediaKeys).map(([mediaKey, value]) => (
-                  <tr key={mediaKey} className="border-t">
-                    <td className="px-4 py-2">{mediaKey}</td>
-                    <td className="px-4 py-2">{value}</td>
-                    <td className="px-4 py-2 text-right">
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleDeleteMediaKey(mediaKey)}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+          <MediaKeyTable
+            mediaKeys={mediaKeys}
+            onDelete={handleDeleteMediaKey}
+          />
         </div>
       </div>
 
