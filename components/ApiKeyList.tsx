@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Input } from '@vercel/examples-ui'
+import Link from 'next/link'
 import fetchAPI from '@lib/fetch-api'
 
 interface ApiKeyListProps {
@@ -88,6 +89,15 @@ const ApiKeyList: React.FC<ApiKeyListProps> = ({
                 </p>
               </span>
               <span className="flex justify-end flex-col sm:flex-row">
+                <Link href={`/key/${encodeURIComponent(key)}`}>
+                  <Button
+                    className="mb-2 sm:mr-2 sm:mb-0"
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Details
+                  </Button>
+                </Link>
                 {editingKey === key ? (
                   <Button
                     className="mb-2 sm:mr-2 sm:mb-0"
@@ -135,35 +145,51 @@ const ApiKeyList: React.FC<ApiKeyListProps> = ({
         </ul>
       )}
 
-      <Button
-        type="button"
-        className="sm:w-44 sm:justify-self-end"
-        onClick={async () => {
-          setLoading(true);
-          try {
-            const response = await fetchAPI('/keys', {
-              method: 'PUT',
-              headers: { 'X-Login-Passwd': loginPasswd },
-              body: JSON.stringify({ name: 'New API Key' }),
-            });
-
-            if (!response.done) {
-              alert(response.error?.message || 'Failed to add new API key');
-              return;
+      <div className="flex justify-end gap-2">
+        <Button
+          type="button"
+          className="sm:w-44"
+          onClick={async () => {
+            try {
+              await mutate();
+            } catch (error) {
+              console.error('Error refreshing API keys:', error);
+              alert('An error occurred while refreshing the API keys');
             }
+          }}
+        >
+          Refresh
+        </Button>
+        <Button
+          type="button"
+          className="sm:w-44"
+          onClick={async () => {
+            setLoading(true);
+            try {
+              const response = await fetchAPI('/keys', {
+                method: 'PUT',
+                headers: { 'X-Login-Passwd': loginPasswd },
+                body: JSON.stringify({ name: 'New API Key' }),
+              });
 
-            await mutate(); // Refresh the data only if successful
-          } catch (error) {
-            console.error('Error adding new API key:', error);
-            alert('An error occurred while adding the API key');
-          } finally {
-            setLoading(false);
-          }
-        }}
-        loading={loading}
-      >
-        Add new API Key
-      </Button>
+              if (!response.done) {
+                alert(response.error?.message || 'Failed to add new API key');
+                return;
+              }
+
+              await mutate();
+            } catch (error) {
+              console.error('Error adding new API key:', error);
+              alert('An error occurred while adding the API key');
+            } finally {
+              setLoading(false);
+            }
+          }}
+          loading={loading}
+        >
+          Add new API Key
+        </Button>
+      </div>
     </div>
   )
 }
