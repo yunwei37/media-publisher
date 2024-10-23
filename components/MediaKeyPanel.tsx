@@ -64,6 +64,14 @@ export function MediaKeyPanel({
       
       {isExpanded && (
         <>
+          <div className="mb-4 text-sm text-gray-600">
+            <p>Required keys for publishing platforms:</p>
+            <ul className="list-disc pl-5">
+              <li><strong>dev.to:</strong> Provide DEV_TO_APIKEY</li>
+              <li><strong>Medium:</strong> Provide MEDIUM_APIKEY</li>
+            </ul>
+          </div>
+
           <MediaKeyForm
             onSubmit={handleSaveMediaKey}
             newKey={newKey}

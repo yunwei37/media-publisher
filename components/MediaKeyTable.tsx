@@ -26,8 +26,8 @@ interface MediaKeyTableProps {
         <tbody>
           {Object.entries(mediaKeys).map(([mediaKey, value]) => (
             <tr key={mediaKey} className="border-t">
-              <td className="px-4 py-2">{mediaKey}</td>
-              <td className="px-4 py-2">{value}</td>
+              <td className="px-4 py-2 break-all">{mediaKey}</td>
+              <td className="px-4 py-2 break-all">{value}</td>
               <td className="px-4 py-2 text-right">
                 <Button
                   variant="secondary"

@@ -1,5 +1,11 @@
 import { useState } from 'react'
 import { Text, Button } from '@vercel/examples-ui'
+import dynamic from 'next/dynamic'
+import { Editor } from '@monaco-editor/react'
+
+const MarkdownPreview = dynamic(() => import('./MarkdownPreview'), {
+  ssr: false,
+})
 
 interface PublishPanelProps {
   apiKey: string
@@ -30,6 +36,7 @@ export function PublishPanel({ apiKey }: PublishPanelProps) {
   const [tags, setTags] = useState(['', '', ''])
   const [isDraft, setIsDraft] = useState(true)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
 
   const handleTagChange = (index: number, value: string) => {
     const newTags = [...tags]
@@ -108,16 +115,44 @@ export function PublishPanel({ apiKey }: PublishPanelProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Content (Markdown)
-          </label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={10}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            placeholder="Write your article in markdown..."
-          />
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Content (Markdown)
+            </label>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">
+                {showPreview ? 'Preview' : 'Editor'}
+              </span>
+              <Toggle checked={showPreview} onChange={setShowPreview} />
+            </div>
+          </div>
+
+          <div className="border rounded-lg">
+            {showPreview ? (
+              <div className="prose prose-sm max-w-none p-4 min-h-[400px] bg-gray-50">
+                <MarkdownPreview content={content} />
+              </div>
+            ) : (
+              <Editor
+                height="400px"
+                defaultLanguage="markdown"
+                value={content}
+                onChange={(value) => setContent(value || '')}
+                theme="vs-dark"
+                options={{
+                  minimap: { enabled: false },
+                  wordWrap: 'on',
+                  lineNumbers: 'on',
+                  renderLineHighlight: 'all',
+                  scrollBeyondLastLine: false,
+                  fontSize: 14,
+                  quickSuggestions: true,
+                  tabSize: 2,
+                }}
+                className="border rounded-lg"
+              />
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4">

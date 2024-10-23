@@ -6,12 +6,19 @@ import { KeyDetails, MediaKeys } from '../../lib/media-keys'
 import { KeyDetailsPanel } from '../../components/KeyDetailsPanel'
 import { MediaKeyPanel } from '../../components/MediaKeyPanel'
 import { PublishPanel } from '../../components/PublishPanel'
+import dynamic from 'next/dynamic'
+
+// Dynamically import markdown preview to avoid SSR issues
+const MarkdownPreview = dynamic(() => import('../../components/MarkdownPreview'), {
+  ssr: false,
+})
 
 function KeyPage() {
   const router = useRouter()
   const { key, loginPasswd } = router.query
   const [mediaKeys, setMediaKeys] = useState<MediaKeys>({})
   const [keyDetails, setKeyDetails] = useState<KeyDetails | null>(null)
+  const [markdownContent, setMarkdownContent] = useState('')
 
   useEffect(() => {
     if (key && loginPasswd) {
