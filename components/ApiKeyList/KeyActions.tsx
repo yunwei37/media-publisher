@@ -43,7 +43,7 @@ const KeyActions: React.FC<KeyActionsProps> = ({
         size="sm"
         variant="secondary"
       >
-        Details
+        Publish content
       </Button>
     </Link>
     {editingKey === apiKey ? (

@@ -3,6 +3,7 @@ import useSWR from 'swr'
 import { Page, Text, Input } from '@vercel/examples-ui'
 import ApiRequest from '@components/api-request'
 import ApiKeyList from '@components/ApiKeyList'
+import QuickStartGuide from '@components/QuickStartGuide'
 
 const fetcher = (url: string, loginPasswd: string) => fetch(url, {
   headers: {
@@ -48,7 +49,7 @@ function MediaPublisher() {
       {/* Auth Section */}
       <section className="max-w-lg mx-auto w-full">
         <div className="flex flex-col gap-4">
-          <Text variant="h2">Authentication</Text>
+          <Text>Input the admin password and click refresh to load API keys.</Text>
           <Input
             type="password"
             placeholder="Enter admin password"
@@ -91,6 +92,11 @@ function MediaPublisher() {
             mutate={mutate}
           />
         </div>
+      </section>
+
+      {/* Quick Start Guide Section */}
+      <section className="max-w-4xl mx-auto w-full">
+        <QuickStartGuide />
       </section>
 
       {/* Info Section */}
