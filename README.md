@@ -6,6 +6,21 @@ The pattern for rate limiting is inspired by the [GitHub API](https://docs.githu
 
 ## media
 
+Test and publish to dev.to:
+
+```sh
+curl -X POST \
+  'https://media-publisher.vercel.app/api/publish/devto' \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: YOUR_API_KEY_HERE' \
+  -d '{
+    "title": "Test Article",
+    "content": "# Hello World\n\nThis is a test article.",
+    "tags": ["test", "api"],
+    "is_draft": true
+  }'
+```
+
 ## Template
 
 ### One-Click Deploy
