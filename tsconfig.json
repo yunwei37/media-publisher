@@ -20,6 +20,6 @@
     },
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "lib/**/*", "__tests__/**/*"],
   "exclude": ["node_modules"]
 }
