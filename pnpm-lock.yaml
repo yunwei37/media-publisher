@@ -29,6 +29,9 @@ importers:
       next:
         specifier: 15.0.1-canary.1
         version: 15.0.1-canary.1(@babel/core@7.25.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      openai:
+        specifier: ^4.68.4
+        version: 4.68.4(zod@3.23.8)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -4931,7 +4934,7 @@ snapshots:
       '@typescript-eslint/parser': 5.56.0(eslint@8.36.0)(typescript@4.9.5)
       eslint: 8.36.0
       eslint-import-resolver-node: 0.3.7
-      eslint-import-resolver-typescript: 3.5.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint@8.36.0))(eslint@8.36.0)
+      eslint-import-resolver-typescript: 3.5.3(eslint-plugin-import@2.31.0)(eslint@8.36.0)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint-import-resolver-typescript@3.5.3)(eslint@8.36.0)
       eslint-plugin-jsx-a11y: 6.10.1(eslint@8.36.0)
       eslint-plugin-react: 7.37.1(eslint@8.36.0)
@@ -4958,7 +4961,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.5.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint@8.36.0))(eslint@8.36.0):
+  eslint-import-resolver-typescript@3.5.3(eslint-plugin-import@2.31.0)(eslint@8.36.0):
     dependencies:
       debug: 4.3.4
       enhanced-resolve: 5.12.0
@@ -4972,14 +4975,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.5.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint@8.36.0))(eslint@8.36.0))(eslint@8.36.0):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.5.3)(eslint@8.36.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 5.56.0(eslint@8.36.0)(typescript@4.9.5)
       eslint: 8.36.0
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.5.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint@8.36.0))(eslint@8.36.0)
+      eslint-import-resolver-typescript: 3.5.3(eslint-plugin-import@2.31.0)(eslint@8.36.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -4994,7 +4997,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.36.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.5.3(eslint-plugin-import@2.31.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint@8.36.0))(eslint@8.36.0))(eslint@8.36.0)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@5.56.0(eslint@8.36.0)(typescript@4.9.5))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.5.3)(eslint@8.36.0)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
