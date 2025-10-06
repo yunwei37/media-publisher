@@ -1,51 +1,103 @@
-# API Rate Limiting by IP and API Keys with Upstash
+# Multi-Platform Media Publisher
 
-This example features API Rate limiting by IP and API Keys at the edge with Redis using [Upstash](https://upstash.com/).
+A simple web application and API for publishing articles to multiple platforms (Dev.to and Medium) simultaneously.
 
-The pattern for rate limiting is inspired by the [GitHub API](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#rate-limiting).
+## Quick Start
 
-## media
+### 1. Setup Environment Variables
 
-Test and publish to dev.to:
-
-```sh
-curl -X POST \
-  'https://media-publisher.vercel.app/api/publish/devto' \
-  -H 'Content-Type: application/json' \
-  -H 'x-api-key: YOUR_API_KEY_HERE' \
-  -d '{
-    "title": "Test Article",
-    "content": "# Hello World\n\nThis is a test article.",
-    "tags": ["test", "api"],
-    "is_draft": true
-  }'
-```
-
-## Template
-
-### One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fedge-functions%2Fapi-rate-limit-and-tokens&env=UPSTASH_REST_API_DOMAIN,UPSTASH_REST_API_TOKEN,API_KEYS_JWT_SECRET_KEY&project-name=api-rate-limit-and-tokens&repository-name=api-rate-limit-and-tokens)
-
-You'll need to have an account with [Upstash](https://upstash.com/). Once that's done, copy the `.env.example` file in this directory to `.env.local` (which will be ignored by Git):
+Copy `.env.example` to `.env.local` and configure:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Then open `.env.local` and set the environment variables to match the REST API of your database. It should look like this:
-
+Required variables:
 ```bash
-UPSTASH_REST_API_DOMAIN = "us1-shiny-firefly-12345.upstash.io"
-UPSTASH_REST_API_TOKEN = "your-api-token"
-API_KEYS_JWT_SECRET_KEY = "a-secret-key"
+PUBLISH_PASSWORD="your-secure-password"
+DEV_TO_API_KEY="your-devto-api-key"
+MEDIUM_API_KEY="your-medium-integration-token"
 ```
 
-Next, run Next.js in development mode:
+**Getting API Keys:**
+- Dev.to: Get your API key from [dev.to/settings/extensions](https://dev.to/settings/extensions)
+- Medium: Get your integration token from [medium.com/me/settings](https://medium.com/me/settings) (under Integration tokens)
+
+### 2. Install and Run
 
 ```bash
+pnpm install
 pnpm dev
 ```
+
+Visit `http://localhost:3000` to use the web interface.
+
+## Usage
+
+### Web Interface
+
+1. Open the application in your browser
+2. Enter your publish password
+3. Fill in the article details (title, content in Markdown, tags)
+4. Select which platforms to publish to
+5. Click "Publish Article"
+
+### API Usage
+
+Publish to multiple platforms simultaneously:
+
+```bash
+curl -X POST \
+  'http://localhost:3000/api/publish-multi' \
+  -H 'Content-Type: application/json' \
+  -H 'x-publish-password: YOUR_PASSWORD' \
+  -d '{
+    "title": "My Article Title",
+    "content": "# Hello World\n\nThis is my article.",
+    "tags": ["tech", "tutorial"],
+    "is_draft": true,
+    "platforms": ["devto", "medium"]
+  }'
+```
+
+Response format:
+```json
+{
+  "results": [
+    {
+      "platform": "devto",
+      "success": true,
+      "article": { /* platform response */ }
+    },
+    {
+      "platform": "medium",
+      "success": true,
+      "article": { /* platform response */ }
+    }
+  ]
+}
+```
+
+## Features
+
+- 📝 **Markdown Support**: Write your content once in Markdown
+- 🚀 **Multi-Platform Publishing**: Publish to Dev.to and Medium simultaneously
+- 🔒 **Password Protected**: Simple password-based authentication
+- 🎯 **Draft Mode**: Publish as drafts for review before going live
+- 🌐 **Web Interface & API**: Use the web UI or integrate via API
+- ⚡ **Parallel Publishing**: Publishes to all platforms concurrently for speed
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import your repository to Vercel
+3. Add the required environment variables in Vercel project settings
+4. Deploy
+
+Make sure to set these environment variables in Vercel:
+- `PUBLISH_PASSWORD`
+- `DEV_TO_API_KEY`
+- `MEDIUM_API_KEY`
 
