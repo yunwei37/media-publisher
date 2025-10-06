@@ -87,6 +87,36 @@ Response format:
 - 🌐 **Web Interface & API**: Use the web UI or integrate via API
 - ⚡ **Parallel Publishing**: Publishes to all platforms concurrently for speed
 
+## Testing
+
+Two test scripts are provided to test the API:
+
+### Bash Script
+
+```bash
+# Start the dev server first
+pnpm dev
+
+# In another terminal, run the test script
+./test-publish.sh YOUR_PASSWORD http://localhost:3000
+```
+
+### Node.js Script
+
+```bash
+# Start the dev server first
+pnpm dev
+
+# In another terminal, run the Node.js test
+node test-publish.js YOUR_PASSWORD http://localhost:3000
+```
+
+Both scripts will:
+- Test publishing to individual platforms
+- Test multi-platform publishing
+- Test error cases (invalid password, missing fields)
+- Create all test articles as drafts (safe to run)
+
 ## Deployment
 
 ### Deploy to Vercel
